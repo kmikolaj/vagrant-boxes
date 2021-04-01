@@ -1,0 +1,10 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "generic/debian9"
+  config.vm.provision "shell", inline: <<-SHELL
+      apt-get update
+      apt-get install dnsutils g++ g++-multilib gcc gcc-multilib -y
+  SHELL
+end
