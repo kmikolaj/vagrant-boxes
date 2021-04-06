@@ -5,6 +5,10 @@ Vagrant.configure("2") do |config|
   config.vm.box = "generic/debian9"
   config.vm.network "private_network", ip: "192.168.121.21"
   config.vm.hostname = "pharaoh"
+  config.vm.provider "libvirt" do |domain|
+    domain.cpus = 3
+    domain.memory = 4096
+  end
   config.vm.provision "shell", inline: <<-SHELL
       apt-get update
       apt-get install dnsutils g++ g++-multilib gcc gcc-multilib -y
