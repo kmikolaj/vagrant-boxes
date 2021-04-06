@@ -9,6 +9,8 @@ Vagrant.configure("2") do |config|
     domain.cpus = 3
     domain.memory = 4096
   end
+  config.vm.provision "file", source: "./qt-5.2.1/build.sh", destination: "qt-5.2.1/build.sh"
+  config.vm.provision "file", source: "./qt-5.2.1/linux-tegra2-qmake-conf.patch", destination: "qt-5.2.1/linux-tegra2-qmake-conf.patch"
   config.vm.provision "shell", inline: <<-SHELL
       dpkg --add-architecture i386
       apt-get update

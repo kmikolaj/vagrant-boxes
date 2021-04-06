@@ -1,0 +1,19 @@
+diff --git b/qt-everywhere-opensource-src-5.2.1/qtbase/mkspecs/devices/linux-tegra2-g++/qmake.conf a/qt-everywhere-opensource-src-5.2.1/qtbase/mkspecs/devices/linux-tegra2-g++/qmake.conf
+index 320e1b8a2..d398c19d9 100644
+--- b/qt-everywhere-opensource-src-5.2.1/qtbase/mkspecs/devices/linux-tegra2-g++/qmake.conf
++++ a/qt-everywhere-opensource-src-5.2.1/qtbase/mkspecs/devices/linux-tegra2-g++/qmake.conf
+@@ -22,10 +22,12 @@ QMAKE_LFLAGS           += -Wl,-rpath-link,$$[QT_SYSROOT]/usr/lib \
+                           -Wl,-rpath-link,$$[QT_SYSROOT]/usr/lib/arm-linux-gnueabi \
+                           -Wl,-rpath-link,$$[QT_SYSROOT]/lib/arm-linux-gnueabi
+ 
+-TEGRA2_CFLAGS           = -mtune=cortex-a9 -march=armv7-a -mhard-float -mfloat-abi=softfp -mfpu=vfpv3-d16
++TEGRA2_CFLAGS           = -mtune=cortex-a9 -march=armv7-a -mhard-float -mfloat-abi=hard -mfpu=vfpv3-d16
+ QMAKE_CFLAGS           += $$TEGRA2_CFLAGS
+ QMAKE_CXXFLAGS         += $$TEGRA2_CFLAGS
+ 
+-include(../common/linux_arm_device_post.conf)
++CONFIG                 += c++11
++
++include(../common/linux_device_post.conf)
+ 
+ load(qt_config)
