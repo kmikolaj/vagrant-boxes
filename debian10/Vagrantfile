@@ -9,4 +9,8 @@ Vagrant.configure("2") do |config|
     domain.cpus = 2
     domain.memory = 2048
   end
+  config.vm.provision "shell", inline: <<-SHELL
+      apt-get update
+      apt-get install mc dnsutils g++ gcc -y
+  SHELL
 end
