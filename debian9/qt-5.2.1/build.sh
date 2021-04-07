@@ -23,6 +23,9 @@ extract() {
 }
 
 prepare() {
+	cd ${ROOTDIR}
+	patch -N -p1 < ${SOURCEDIR}/sysroot-gles-fix.patch
+
 	cd ${TEMPDIR}
 	patch -N -p1 < ${SOURCEDIR}/linux-tegra2-qmake-conf.patch
 	mkdir -p ${BUILDDIR}
