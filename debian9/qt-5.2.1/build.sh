@@ -3,9 +3,10 @@
 SOURCEDIR=$(realpath "$(dirname "$0")")
 TEMPDIR=${HOME}/build
 BUILDDIR=${TEMPDIR}/qt5-debug-build
-INSTALLDIR=${TEMPDIR}/qt5-debug-install
 
 ROOTDIR=/usr/local
+PREFIX=/usr/local
+INSTALLDIR=${PREFIX}/Qt5.2_tegra2-dbg
 SYSROOT=${ROOTDIR}/colibri-t20
 BINCROSS=${ROOTDIR}/gcc-linaro-arm-linux-gnueabihf/bin/arm-linux-gnueabihf
 
@@ -29,7 +30,6 @@ prepare() {
 	cd ${TEMPDIR}
 	patch -N -p1 < ${SOURCEDIR}/linux-tegra2-qmake-conf.patch
 	mkdir -p ${BUILDDIR}
-	mkdir -p ${INSTALLDIR}
 }
 
 configure() {
@@ -39,9 +39,16 @@ configure() {
 		-developer-build \
 		-nomake examples \
 		-nomake tests \
-		-prefix /usr/local/Qt5.2_tegra2-dbg \
-		-extprefix /usr/local/qt521 \
-		-hostprefix /usr/local/qt5.2.1-tools \
+		-prefix ${PREFIX} \
+		-bindir ${INSTALLDIR}/bin \
+		-headerdir ${INSTALLDIR}/include \
+		-libdir ${INSTALLDIR}/lib \
+		-archdatadir ${INSTALLDIR} \
+		-datadir ${INSTALLDIR} \
+		-sysconfdir ${INSTALLDIR}/etc/xdg \
+		-examplesdir ${INSTALLDIR}/examples \
+		-testsdir ${INSTALLDIR}/tests \
+		-hostprefix ${SYSROOT}${PREFIX}/Qt5.2_tegra2-dbg-tools \
 		-device tegra2 \
 		-device-option CROSS_COMPILE=${BINCROSS}- \
 		-sysroot ${SYSROOT} \
