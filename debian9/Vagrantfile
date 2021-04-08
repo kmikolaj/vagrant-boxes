@@ -9,6 +9,9 @@ Vagrant.configure("2") do |config|
     domain.cpus = 3
     domain.memory = 4096
   end
+  config.vm.provision "shell", 
+    run: "always",
+    inline: "echo \"nameserver $(ip r s | grep default | cut -f 3 -d' ')\" | tee /etc/resolv.conf"
   config.vm.synced_folder "./build", "/home/vagrant/build",
     type: "nfs",
     nfs_version: 4,
