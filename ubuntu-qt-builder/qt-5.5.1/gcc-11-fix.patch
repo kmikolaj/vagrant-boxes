@@ -1,0 +1,10 @@
+diff --git a/qtbase/mkspecs/common/g++-base.conf b/qtbase/mkspecs/common/g++-base.conf
+index d687dbc..c7278aa 100644
+--- a/qt-everywhere-opensource-src-5.5.1/qtbase/mkspecs/common/g++-base.conf
++++ b/qt-everywhere-opensource-src-5.5.1/qtbase/mkspecs/common/g++-base.conf
+@@ -29,3 +29,5 @@ QMAKE_CXXFLAGS_USE_PRECOMPILE = $$QMAKE_CFLAGS_USE_PRECOMPILE
+ 
+ QMAKE_CXXFLAGS_CXX11    = -std=c++0x
+ QMAKE_LFLAGS_CXX11      =
++
++QMAKE_CXXFLAGS          += -Wno-expansion-to-defined -Wno-deprecated-copy
