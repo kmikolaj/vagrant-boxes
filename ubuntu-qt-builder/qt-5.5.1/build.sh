@@ -49,7 +49,6 @@ configure() {
 		-hostprefix ${PREFIX} \
 		-shared \
 		-silent \
-		-skip qt3d -skip qtactiveqt -skip qtenginio -skip qtandroidextras -skip qtcanvas3d -skip qtconnectivity -skip qtdoc -skip qtgraphicaleffects -skip qtimageformats -skip qtlocation -skip qtmacextras -skip qtmultimedia -skip qtquickcontrols -skip qtscript -skip qtsensors -skip qtserialport -skip qtsvg -skip qttools -skip qttranslations -skip qtwayland -skip qtwebchannel -skip qtwebengine -skip qtwebsockets -skip qtwinextras -skip qtx11extras -skip qtxmlpatterns -skip qtwebkit \
 		-c++11 \
 		-reduce-relocations \
 		-no-strip \
