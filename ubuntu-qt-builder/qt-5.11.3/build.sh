@@ -29,9 +29,10 @@ extract() {
 }
 
 prepare() {
-	grep -qG "^QMAKE_CXXFLAGS\s*+=" ${SOURCEDIR}/qtbase/mkspecs/common/g++-base.conf || echo "QMAKE_CXXFLAGS          += -Wno-expansion-to-defined -fpermissive -Wno-deprecated-declarations" >> ${SOURCEDIR}/qtbase/mkspecs/common/g++-base.conf
+	grep -qG "^QMAKE_CXXFLAGS\s*+=" ${SOURCEDIR}/qtbase/mkspecs/common/g++-base.conf || echo "QMAKE_CXXFLAGS          += -Wno-expansion-to-defined -Wno-shift-overflow -fpermissive -Wno-deprecated-declarations" >> ${SOURCEDIR}/qtbase/mkspecs/common/g++-base.conf
 
 	cd ${TEMPDIR}
+	patch -N -p1 < ${SCRIPTDIR}/no-cxx14-aggregate-initialization.patch
 	mkdir -p ${BUILDDIR}
 }
 
@@ -50,6 +51,7 @@ configure() {
 		-hostprefix ${PREFIX} \
 		-shared \
 		-silent \
+		-skip qt3d -skip qtactiveqt -skip qtenginio -skip qtandroidextras -skip qtcanvas3d -skip qtconnectivity -skip qtdoc -skip qtgraphicaleffects -skip qtimageformats -skip qtlocation -skip qtmacextras -skip qtmultimedia -skip qtquickcontrols -skip qtscript -skip qtsensors -skip qtserialport -skip qtsvg -skip qttools -skip qttranslations -skip qtwebchannel -skip qtwebengine -skip qtwebsockets -skip qtwinextras -skip qtx11extras -skip qtxmlpatterns -skip qtgamepad \
 		-c++std c++11 \
 		-reduce-relocations \
 		-no-strip \
@@ -68,6 +70,7 @@ configure() {
 		-dbus-linked \
 		-qt-xcb \
 		-qt-pcre \
+		-qt-doubleconversion \
 		-xcb-xlib \
 		-sql-sqlite \
 		-system-freetype \
@@ -80,6 +83,8 @@ configure() {
 		-qpa xcb \
 		-no-use-gold-linker \
 		-no-warnings-are-errors
+
+	cat ${BUILDDIR}/qtbase/mkspecs/qconfig.pri
 }
 
 build() {
@@ -121,7 +126,7 @@ install() {
 #extract
 prepare
 configure
-build
-install
+#build
+#install
 
 # vim:set ts=2 sw=2 noet ft=sh:
