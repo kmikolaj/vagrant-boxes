@@ -1,6 +1,9 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+# build dir
+BUILDDIR = (ENV['HOME'] ||= '/home/vagrant') + '/workspace/qt5'
+
 Vagrant.configure("2") do |config|
   config.vm.box = "generic/ubuntu1804"
   config.vm.network "private_network", ip: "192.168.121.24"
@@ -9,32 +12,51 @@ Vagrant.configure("2") do |config|
     domain.cpus = 4
     domain.memory = 6000
   end
-  config.vm.provision "shell", env: { "HOST_HOME" => ENV['HOME'] }, inline: <<-SHELL
-    echo "export QT_BUILD_PREFIX=$HOST_HOME/workspace/qt5/" >> /home/vagrant/.profile
-  SHELL
   config.vm.provision "shell",
     run: "always",
     inline: "echo \"nameserver $(ip r s | grep default | cut -f 3 -d' ')\" | tee /etc/resolv.conf"
-  config.vm.synced_folder "./build", "/home/vagrant/build",
+  config.vm.provision "shell", env: { "QT_BUILD_PREFIX" => BUILDDIR }, inline: <<-SHELL
+    echo "export QT_BUILD_PREFIX=$QT_BUILD_PREFIX" >> /home/vagrant/.profile
+    echo "Build dir: $QT_BUILD_PREFIX"
+  SHELL
+  config.vm.synced_folder BUILDDIR + "/build", "/home/vagrant/build",
     type: "nfs",
     nfs_version: 4,
     nfs_udp: false,
     nfs_export: true,
     linux__nfs_options: ['rw','no_subtree_check','all_squash','async']
-  config.vm.provision "file", source: "./qt-5.2.1/build.sh", destination: "qt-5.2.1/build.sh"
-  config.vm.provision "file", source: "./qt-5.5.1/build.sh", destination: "qt-5.5.1/build.sh"
-  config.vm.provision "file", source: "./qt-5.11.3/build.sh", destination: "qt-5.11.3/build.sh"
+  config.vm.synced_folder BUILDDIR, BUILDDIR,
+    type: "nfs",
+    nfs_version: 4,
+    nfs_udp: false,
+    nfs_export: true,
+    linux__nfs_options: ['rw','no_subtree_check','all_squash','async']
+  config.vm.synced_folder "./qt-5.2.1", "/home/vagrant/qt-5.2.1"
+  config.vm.synced_folder "./qt-5.5.1", "/home/vagrant/qt-5.5.1"
+  config.vm.synced_folder "./qt-5.11.3", "/home/vagrant/qt-5.11.3"
   config.vm.provision "shell", inline: <<-SHELL
       sed -Ei 's/^# deb-src /deb-src /' /etc/apt/sources.list
       apt-get update
-      apt-get install mc dnsutils g++ gcc build-essential fakeroot devscripts -y
       apt-get install \
-          libcurl4-openssl-dev libasound2-dev libudev-dev \
+          mc silversearcher-ag dnsutils g++ g++-5 gcc gcc-5 fakeroot devscripts \
+          automake make bison cmake flex gperf chrpath patchelf \
+          dpkg-dev libc6-dev \
+          libssl1.0-dev libasound2-dev libudev-dev libts-dev libgtk2.0-dev \
           libfontconfig1-dev libfreetype6-dev libx11-dev libx11-xcb-dev libxext-dev \
           libxfixes-dev libxi-dev libxrender-dev libxcb1-dev libxcb-glx0-dev libxcb-keysyms1-dev  \
           libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync0-dev libxcb-xfixes0-dev libxcb-shape0-dev \
           libxcb-randr0-dev libxcb-render-util0-dev libxcb-xinerama0-dev libxkbcommon-dev libxkbcommon-x11-dev \
-          libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev -y
-      apt-get build-dep qtbase5-dev -y
+          libgl1-mesa-glx libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
+          firebird-dev freetds-dev libspeex-dev libbluetooth-dev \
+          libatspi2.0-dev libcups2-dev libcupsimage2-dev libdbus-1-dev \
+          libdouble-conversion-dev libevdev-dev libgbm-dev \
+          libglu1-mesa-dev libgtk-3-dev libnss3-dev libopus-dev libjsoncpp-dev \
+          libinput-dev libjbig-dev liblzma-dev libmtdev-dev \
+          libpq-dev libproxy-dev libpulse-dev libsqlite3-dev libtiff-dev \
+          libtiff5-dev libwacom-dev libxtst-dev unixodbc-dev x11proto-record-dev \
+          libbison-dev libbrotli-dev libhyphen-dev libvulkan-dev \
+          libwebp-dev libwoff-dev libxml2-dev libxslt1-dev zlib1g-dev -y
+      echo "Set gcc-5 as default"
+      find /usr/bin -type l -regextype egrep -regex "/usr/bin/.*(gcc|g\\+\\+)(-[a-z]+)*" -exec ln -r -s -f {}-5 {} \\;
   SHELL
 end

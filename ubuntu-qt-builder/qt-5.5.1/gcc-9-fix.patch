@@ -7,4 +7,4 @@ index d687dbc..c7278aa 100644
  QMAKE_CXXFLAGS_CXX11    = -std=c++0x
  QMAKE_LFLAGS_CXX11      =
 +
-+QMAKE_CXXFLAGS          += -Wno-expansion-to-defined -Wno-deprecated-copy
++QMAKE_CXXFLAGS          += -Wno-expansion-to-defined -fpermissive -Wno-deprecated-declarations -Wno-deprecated-copy

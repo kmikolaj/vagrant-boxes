@@ -1,19 +1,24 @@
 #!/bin/bash
 
-SOURCEDIR=$(realpath "$(dirname "$0")")
+SCRIPTDIR=$(realpath "$(dirname "$0")")
 TEMPDIR=${HOME}/build
+VERSION=5.11.3
 BUILDDIR=${TEMPDIR}/qt5.11.3-debug-build
+SOURCEDIR=${TEMPDIR}/qt-everywhere-src-5.11.3
 
-ROOTDIR=/usr/local
-PREFIX=${QT_BUILD_PREFIX}/qt5.11.3-debug
+PREFIX=${QT_BUILD_PREFIX}/qt-5.11.3-debug-x86_64
 
-SOURCE=qt-everywhere-opensource-src-5.11.3.tar.xz
+SOURCE=qt-everywhere-src-5.11.3.tar.xz
 URL=https://download.qt.io/new_archive/qt/5.11/5.11.3/single/${SOURCE}
-MD5SUM=0c8d2aa45f38be9c3f7c9325eb059d9d
+MD5SUM=02b353bfe7a40a8dc4274e1d17226d2b
+
+mkdir -p ${BUILDDIR}
 
 extract() {
 	cd ${TEMPDIR}
-	wget -nc ${URL} -O ${SOURCE}
+	if ! echo "${MD5SUM}  ${SOURCE}" | md5sum -c - ; then
+		wget -c ${URL} -O ${SOURCE}
+	fi
 	if ! echo "${MD5SUM}  ${SOURCE}" | md5sum -c - ; then
 		exit 1
 	fi
@@ -21,43 +26,46 @@ extract() {
 }
 
 prepare() {
+	grep -qG "^QMAKE_CXXFLAGS\s*+=" ${SOURCEDIR}/qtbase/mkspecs/common/g++-base.conf || echo "QMAKE_CXXFLAGS          += -Wno-expansion-to-defined -fpermissive -Wno-deprecated-declarations" >> ${SOURCEDIR}/qtbase/mkspecs/common/g++-base.conf
+
+	cd ${TEMPDIR}
 	mkdir -p ${BUILDDIR}
 }
 
 configure() {
 	cd ${BUILDDIR}
-	${TEMPDIR}/qt-everywhere-opensource-src-5.11.3/configure -v \
+	${TEMPDIR}/qt-everywhere-src-5.11.3/configure -v \
 		-opensource -confirm-license \
-		-developer-build \
-		-optimized-qmake \
+		-release \
+		-force-debug-info \
+		-separate-debug-info \
+		-qml-debug \
 		-nomake examples \
 		-nomake tests \
+		-prefix ${PREFIX} \
+		-extprefix ${PREFIX} \
+		-hostprefix ${PREFIX} \
 		-shared \
 		-silent \
-		-c++11 \
+		-skip qt3d -skip qtactiveqt -skip qtenginio -skip qtandroidextras -skip qtcanvas3d -skip qtconnectivity -skip qtdoc -skip qtgraphicaleffects -skip qtimageformats -skip qtlocation -skip qtmacextras -skip qtmultimedia -skip qtquickcontrols -skip qtscript -skip qtsensors -skip qtserialport -skip qtsvg -skip qttools -skip qttranslations -skip qtwayland -skip qtwebchannel -skip qtwebengine -skip qtwebsockets -skip qtwinextras -skip qtx11extras -skip qtxmlpatterns -skip qtgamepad \
+		-c++std c++11 \
 		-reduce-relocations \
 		-no-strip \
 		-no-pch \
 		-no-rpath \
+		-R ${PREFIX}/lib \
 		-pkg-config \
+		-no-directfb \
 		-widgets \
 		-libudev \
 		-linuxfb \
+		-vulkan \
 		-kms \
-		-directfb \
 		-fontconfig \
-		-xcursor \
-		-xinerama \
-		-xinput \
-		-xinput2 \
-		-xfixes \
-		-xrandr \
-		-xrender \
-		-xshape \
-		-xsync \
-		-xvideo \
-		-dbus \
+		-inotify \
+		-dbus-linked \
 		-qt-xcb \
+		-qt-pcre \
 		-xcb-xlib \
 		-sql-sqlite \
 		-system-freetype \
@@ -65,13 +73,10 @@ configure() {
 		-system-libpng \
 		-system-zlib \
 		-accessibility \
-		-gstreamer 1.0 \
-		-alsa \
-		-pulseaudio \
 		-glib \
 		-qreal double \
 		-qpa xcb \
-		-debug \
+		-no-use-gold-linker \
 		-no-warnings-are-errors
 }
 
@@ -81,13 +86,40 @@ build() {
 }
 
 install() {
+	sed -i -e '/^QMAKE_CXXFLAGS\s*+=/d' ${SOURCEDIR}/qtbase/mkspecs/common/g++-base.conf
 	cd ${BUILDDIR}
-	make install
+	echo "Installing to ${PREFIX}"
+	make -j$(nproc) install
+
+	# copy necessary libraries
+	libs=(
+				libicudata.so.60.2
+				libicui18n.so.60.2
+				libicuuc.so.60.2
+	)
+
+	local DESTINATION=${PREFIX}/lib
+	mkdir -p ${DESTINATION}
+	for i in ${!libs[@]}; do
+		name0=${libs[$i]}
+		name1=${name0%.*}
+		name2=${name1%.*}
+		name3=${name2%.*}
+		find /usr/lib -regextype egrep -regex ".*(${name0}|${name1}|${name2}|${name3})" -exec cp -Pu --preserve=all {} ${DESTINATION} \;
+		SOLIB=${DESTINATION}/${name0}
+		chmod 755 ${SOLIB}
+		# fix rpath (may be unstable)
+		patchelf --set-rpath "$PREFIX/lib" ${SOLIB}
+	done
+
+	# Drop QMAKE_PRL_BUILD_DIR because reference the build dir
+	find "${DESTINATION}" -type f -name '*.prl' -exec sed -i -e '/^QMAKE_PRL_BUILD_DIR/d' {} \;
 }
 
-extract
+#extract
 prepare
 configure
 build
+install
 
 # vim:set ts=2 sw=2 noet ft=sh:
