@@ -1,0 +1,36 @@
+diff --git a/qt-everywhere-src-5.11.3/qtwayland/src/client/qwaylanddisplay_p.h b/qt-everywhere-src-5.11.3/qtwayland/src/client/qwaylanddisplay_p.h
+index a65ed320d..ad2c1f1de 100644
+--- a/qt-everywhere-src-5.11.3/qtwayland/src/client/qwaylanddisplay_p.h
++++ b/qt-everywhere-src-5.11.3/qtwayland/src/client/qwaylanddisplay_p.h
+@@ -194,8 +194,9 @@ private:
+     void requestWaylandSync();
+ 
+     struct Listener {
+-        RegistryListener listener = nullptr;
+-        void *data = nullptr;
++        Listener(RegistryListener l=nullptr, void* d=nullptr) : listener(l), data(d) {}
++        RegistryListener listener;
++        void *data;
+     };
+ 
+     struct wl_display *mDisplay = nullptr;
+diff --git a/qt-everywhere-src-5.11.3/qtwayland/src/compositor/extensions/qwaylandxdgshellv6_p.h b/qt-everywhere-src-5.11.3/qtwayland/src/compositor/extensions/qwaylandxdgshellv6_p.h
+index e763f6ab4..cd2c2913c 100644
+--- a/qt-everywhere-src-5.11.3/qtwayland/src/compositor/extensions/qwaylandxdgshellv6_p.h
++++ b/qt-everywhere-src-5.11.3/qtwayland/src/compositor/extensions/qwaylandxdgshellv6_p.h
+@@ -135,9 +135,10 @@ class Q_WAYLAND_COMPOSITOR_EXPORT QWaylandXdgToplevelV6Private : public QObjectP
+     Q_DECLARE_PUBLIC(QWaylandXdgToplevelV6)
+ public:
+     struct ConfigureEvent {
++        ConfigureEvent(const QVector<QWaylandXdgToplevelV6::State> &st = QVector<QWaylandXdgToplevelV6::State>(), const QSize &si = QSize(0, 0), uint se = 0) : states(st), size(si), serial(se) {}
+         QVector<QWaylandXdgToplevelV6::State> states;
+-        QSize size = {0, 0};
+-        uint serial = 0;
++        QSize size;
++        uint serial;
+     };
+ 
+     QWaylandXdgToplevelV6Private(QWaylandXdgSurfaceV6 *xdgSurface, const QWaylandResource& resource);
+-- 
+2.32.0
+

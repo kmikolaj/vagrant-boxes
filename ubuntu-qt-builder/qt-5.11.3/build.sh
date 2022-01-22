@@ -29,9 +29,10 @@ extract() {
 }
 
 prepare() {
-	grep -qG "^QMAKE_CXXFLAGS\s*+=" ${SOURCEDIR}/qtbase/mkspecs/common/g++-base.conf || echo "QMAKE_CXXFLAGS          += -Wno-expansion-to-defined -fpermissive -Wno-deprecated-declarations" >> ${SOURCEDIR}/qtbase/mkspecs/common/g++-base.conf
+	grep -qG "^QMAKE_CXXFLAGS\s*+=" ${SOURCEDIR}/qtbase/mkspecs/common/g++-base.conf || echo "QMAKE_CXXFLAGS          += -Wno-expansion-to-defined -Wno-shift-overflow -fpermissive -Wno-deprecated-declarations" >> ${SOURCEDIR}/qtbase/mkspecs/common/g++-base.conf
 
 	cd ${TEMPDIR}
+	patch -N -p1 < ${SCRIPTDIR}/no-cxx14-aggregate-initialization.patch
 	mkdir -p ${BUILDDIR}
 }
 
@@ -68,6 +69,7 @@ configure() {
 		-dbus-linked \
 		-qt-xcb \
 		-qt-pcre \
+		-qt-doubleconversion \
 		-xcb-xlib \
 		-sql-sqlite \
 		-system-freetype \
