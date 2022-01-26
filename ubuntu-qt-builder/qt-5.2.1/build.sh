@@ -30,6 +30,10 @@ prepare() {
 
 	cd ${TEMPDIR}
 	patch -N -p1 < ${SCRIPTDIR}/alsa-test.patch
+	patch -N -p1 < ${SCRIPTDIR}/gcc5-webkit.patch
+	patch -N -p1 < ${SCRIPTDIR}/gcc5-glib-webkit.diff
+	patch -N -p1 < ${SCRIPTDIR}/new-char-types.patch
+	patch -N -p1 < ${SCRIPTDIR}/icu60.patch
 	mkdir -p ${BUILDDIR}
 }
 
