@@ -16,8 +16,10 @@ Vagrant.configure("2") do |config|
     run: "always",
     inline: "echo \"nameserver $(ip r s | grep default | cut -f 3 -d' ')\" | tee /etc/resolv.conf"
   config.vm.provision "shell", env: { "QT_BUILD_PREFIX" => BUILDDIR }, inline: <<-SHELL
-    echo "export QT_BUILD_PREFIX=$QT_BUILD_PREFIX" >> /home/vagrant/.profile
+    echo "\nexport QT_BUILD_PREFIX=$QT_BUILD_PREFIX" >> /home/vagrant/.profile
     echo "Build dir: $QT_BUILD_PREFIX"
+    install -dm755 -o vagrant -g vagrant /home/vagrant/bin
+    echo "Create local bin directory: /home/vagrant/bin"
   SHELL
   config.vm.synced_folder BUILDDIR + "/build", "/home/vagrant/build",
     type: "nfs",
@@ -34,6 +36,7 @@ Vagrant.configure("2") do |config|
   config.vm.synced_folder "./qt-5.2.1", "/home/vagrant/qt-5.2.1"
   config.vm.synced_folder "./qt-5.5.1", "/home/vagrant/qt-5.5.1"
   config.vm.synced_folder "./qt-5.11.3", "/home/vagrant/qt-5.11.3"
+  config.vm.provision "file", source: "./common/functions.sh", destination: "common/functions.sh"
   config.vm.provision "shell", inline: <<-SHELL
       sed -Ei 's/^# deb-src /deb-src /' /etc/apt/sources.list
       apt-get update
@@ -56,7 +59,5 @@ Vagrant.configure("2") do |config|
           libtiff5-dev libwacom-dev libxtst-dev unixodbc-dev x11proto-record-dev \
           libbison-dev libbrotli-dev libhyphen-dev libvulkan-dev \
           libwebp-dev libwoff-dev libxml2-dev libxslt1-dev zlib1g-dev -y
-      echo "Set gcc-5 as default"
-      find /usr/bin -type l -regextype egrep -regex "/usr/bin/.*(gcc|g\\+\\+)(-[a-z]+)*" -exec ln -r -s -f {}-5 {} \\;
   SHELL
 end

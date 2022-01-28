@@ -1,5 +1,7 @@
 #!/bin/bash
 
+. ${HOME}/common/functions.sh
+
 SCRIPTDIR=$(realpath "$(dirname "$0")")
 TEMPDIR=${HOME}/build
 VERSION=5.11.3
@@ -13,6 +15,7 @@ URL=https://download.qt.io/new_archive/qt/5.11/5.11.3/single/${SOURCE}
 MD5SUM=02b353bfe7a40a8dc4274e1d17226d2b
 
 mkdir -p ${BUILDDIR}
+set_gcc_version 7
 
 extract() {
 	cd ${TEMPDIR}
@@ -92,9 +95,9 @@ install() {
 
 	# copy necessary libraries
 	libs=(
-				libicudata.so.60.2
-				libicui18n.so.60.2
-				libicuuc.so.60.2
+		libicudata.so.60.2
+		libicui18n.so.60.2
+		libicuuc.so.60.2
 	)
 
 	local DESTINATION=${PREFIX}/lib

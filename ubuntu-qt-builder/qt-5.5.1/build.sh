@@ -1,5 +1,7 @@
 #!/bin/bash
 
+. ${HOME}/common/functions.sh
+
 SCRIPTDIR=$(realpath "$(dirname "$0")")
 TEMPDIR=${HOME}/build
 VERSION=5.5.1
@@ -13,6 +15,7 @@ URL=https://download.qt.io/new_archive/qt/5.5/5.5.1/single/${SOURCE}
 MD5SUM=c2a249e8795d45200d997d96860d0353
 
 mkdir -p ${BUILDDIR}
+set_gcc_version 5
 
 extract() {
 	cd ${TEMPDIR}
@@ -106,11 +109,11 @@ install() {
 
 	# copy necessary libraries
 	libs=(
-				libssl.so.1.0.0
-				libcrypto.so.1.0.0
-				libicudata.so.60.2
-				libicui18n.so.60.2
-				libicuuc.so.60.2
+		libssl.so.1.0.0
+		libcrypto.so.1.0.0
+		libicudata.so.60.2
+		libicui18n.so.60.2
+		libicuuc.so.60.2
 	)
 
 	local DESTINATION=${PREFIX}/lib
