@@ -36,7 +36,8 @@ configure() {
 	cd ${BUILDDIR}
 	${TEMPDIR}/qt-everywhere-opensource-src-5.2.1/configure -v \
 		-opensource -confirm-license \
-		-developer-build \
+		-debug \
+		-qml-debug \
 		-nomake examples \
 		-nomake tests \
 		-prefix ${PREFIX} \
@@ -75,8 +76,10 @@ configure() {
 		-xshape \
 		-xsync \
 		-xvideo \
-		-dbus \
+		-dbus-linked \
+		-openssl \
 		-qt-xcb \
+		-qt-pcre \
 		-xcb-xlib \
 		-sql-sqlite \
 		-system-freetype \
@@ -98,7 +101,6 @@ configure() {
 		-qreal float \
 		-qpa xcb \
 		-opengl es2 -no-eglfs \
-		-debug \
 		-no-warnings-are-errors
 }
 
