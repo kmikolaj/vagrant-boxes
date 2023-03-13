@@ -36,6 +36,7 @@ Vagrant.configure("2") do |config|
   config.vm.synced_folder "./qt-5.2.1", "/home/vagrant/qt-5.2.1"
   config.vm.synced_folder "./qt-5.5.1", "/home/vagrant/qt-5.5.1"
   config.vm.synced_folder "./qt-5.11.3", "/home/vagrant/qt-5.11.3"
+  config.vm.synced_folder "./qt-5.12.12", "/home/vagrant/qt-5.12.12"
   config.vm.provision "file", source: "./common/functions.sh", destination: "common/functions.sh"
   config.vm.provision "shell", inline: <<-SHELL
       sed -Ei 's/^# deb-src /deb-src /' /etc/apt/sources.list
